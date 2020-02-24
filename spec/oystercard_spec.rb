@@ -15,9 +15,14 @@ RSpec.describe Oystercard do
     end 
 
     it 'adds amount to current balance' do
-        card = Oystercard.new(5)
+      card = Oystercard.new(5)
       card.top_up(10)
       expect(card.balance).to eq 15
+    end 
+
+    it 'has a balance limit of £90' do
+      card = Oystercard.new(45)
+      expect{card.top_up(50)}.to raise_error 'The balance has exceeded the limit'
     end 
   end   
 end 
