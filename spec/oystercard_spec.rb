@@ -21,8 +21,20 @@ RSpec.describe Oystercard do
     end 
 
     it 'has a balance limit of £90' do
-      card = Oystercard.new(45)
-      expect{card.top_up(50)}.to raise_error 'The balance has exceeded the limit'
+      maximum_balance = Oystercard::MAXIMUM_BALANCE
+      card = Oystercard.new(maximum_balance)
+      expect{card.top_up(1)}.to raise_error 'The balance has exceeded the limit'
     end 
   end   
+
+  describe '#deduct' do
+    it 'deducts when touch out' do
+    expect(subject).to respond_to(:deduct).with(1).argument
+    end
+
+    it 'deducts the fare £2.4 per travel' do
+      card = Oystercard.new(5)
+      expect{card.deduct 2.4}.to change { card.balance }.by (-2.4)
+    end  
+  end  
 end 
