@@ -38,6 +38,7 @@ RSpec.describe Oystercard do
 #   end 
   
   describe '#touch_in' do
+  let(:station){double(:station)} 
     # step1: before touching in, first ensure that the card is not in use
     it 'is initially not in use' do
       expect(subject).not_to be_in_journey
@@ -45,20 +46,27 @@ RSpec.describe Oystercard do
     # step2: after made sure the card is not in use, allow to touch in
     it 'can touch in if not already touched in' do
       card = Oystercard.new(10)
-      card.touch_in
+      card.touch_in(station)
       expect(card).to be_in_journey
     end 
 
     it 'cannot touch in when balance is below minimum balance' do
       card = Oystercard.new(0.5)
-      expect{card.touch_in}.to raise_error 'Balance is below minimum'
+      expect{card.touch_in(station)}.to raise_error 'Balance is below minimum'
+    end 
+    
+    it 'record the station when you touch in' do
+      card = Oystercard.new(10)
+      card.touch_in(station)
+      expect(card.entry_station).to eq station
     end 
   end 
   
   describe '#touch_out' do 
+  let(:station){double(:station)} 
     it 'can touch out' do
       card = Oystercard.new(20)
-      card.touch_in
+      card.touch_in(station)
       card.touch_out
       expect(card).not_to be_in_journey
     end

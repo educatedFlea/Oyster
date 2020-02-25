@@ -3,7 +3,7 @@ class Oystercard
   MININUM_BALANCE_TO_TOUCH_IN = 1
   MINIMUM_FARE = 1
   MAXIMUM_BALANCE = 90
-  attr_accessor :balance, :MAXIMUM_BALANCE, :in_journey, :MININUM_BALANCE_TO_TOUCH_IN, :MINIMUM_FARE
+  attr_accessor :balance, :MAXIMUM_BALANCE, :in_journey, :MININUM_BALANCE_TO_TOUCH_IN, :MINIMUM_FARE, :entry_station
   
   def initialize(balance = DEFAULT_BALANCE)
     fail 'The balance has exceeded the limit' if balance  > MAXIMUM_BALANCE
@@ -14,21 +14,19 @@ class Oystercard
     fail 'The balance has exceeded the limit' if balance + amount > MAXIMUM_BALANCE
     @balance += amount
   end
-
-  
   
   def in_journey?
-    @in_journey 
+    !!entry_station
   end  
   
-  def touch_in
+  def touch_in(station)
     fail 'Balance is below minimum' if balance < MININUM_BALANCE_TO_TOUCH_IN
-    @in_journey = true
+    @entry_station = station
   end 
   
   def touch_out
-    @in_journey = false
     deduct
+    @entry_station = nil
   end 
 
   private
