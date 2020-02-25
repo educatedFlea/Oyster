@@ -28,14 +28,14 @@ RSpec.describe Oystercard do
     end 
   end   
 
-  describe '#deduct' do
-    it {is_expected.to respond_to(:deduct).with(1).argument}
+#   describe '#deduct' do
+#     it {is_expected.to respond_to(:deduct).with(1).argument}
 
-    it 'deducts the fare £2.4 per travel' do
-      card = Oystercard.new(5)
-      expect{card.deduct 2.4}.to change { card.balance }.by (-2.4)
-    end  
-  end 
+#     it 'deducts the fare £2.4 per travel' do
+#       card = Oystercard.new(5)
+#       expect{card.deduct 2.4}.to change { card.balance }.by (-2.4)
+#     end  
+#   end 
   
   describe '#touch_in' do
     # step1: before touching in, first ensure that the card is not in use
@@ -44,16 +44,28 @@ RSpec.describe Oystercard do
     end 
     # step2: after made sure the card is not in use, allow to touch in
     it 'can touch in if not already touched in' do
-      subject.touch_in
-      expect(subject).to be_in_journey
+      card = Oystercard.new(10)
+      card.touch_in
+      expect(card).to be_in_journey
+    end 
+
+    it 'cannot touch in when balance is below minimum balance' do
+      card = Oystercard.new(0.5)
+      expect{card.touch_in}.to raise_error 'Balance is below minimum'
     end 
   end 
   
   describe '#touch_out' do 
     it 'can touch out' do
-      subject.touch_in
-      subject.touch_out
-      expect(subject).not_to be_in_journey
+      card = Oystercard.new(20)
+      card.touch_in
+      card.touch_out
+      expect(card).not_to be_in_journey
     end
+
+    it 'update the balance by deducting the minimum fare £1 when touch out' do
+    card = Oystercard.new(5)
+    expect{card.touch_out}.to change {card.balance}.by(-Oystercard::MINIMUM_FARE)
+    end 
   end 
 end 
