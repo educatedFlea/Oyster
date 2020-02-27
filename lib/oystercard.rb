@@ -1,3 +1,4 @@
+require_relative 'journey'
 class Oystercard 
   DEFAULT_BALANCE = 0
   MININUM_BALANCE_TO_TOUCH_IN = 1
