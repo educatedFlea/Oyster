@@ -24,21 +24,13 @@ RSpec.describe Oystercard do
     it 'has a balance limit of £90' do
       maximum_balance = Oystercard::MAXIMUM_BALANCE
       card = Oystercard.new(maximum_balance)
-      expect{card.top_up(1)}.to raise_error 'The balance has exceeded the limit'
+      expect{card.top_up(1)}.to raise_error "The balance has exceeded the limit £#{Oystercard::MAXIMUM_BALANCE}"
     end 
   end   
-
-#   describe '#deduct' do
-#     it {is_expected.to respond_to(:deduct).with(1).argument}
-
-#     it 'deducts the fare £2.4 per travel' do
-#       card = Oystercard.new(5)
-#       expect{card.deduct 2.4}.to change { card.balance }.by (-2.4)
-#     end  
-#   end 
   
   describe '#touch_in' do
-  let(:station){double(:station)} 
+  let(:entry_station){double(:entry_station)} 
+  let(:exit_station){double(:exit_station)} 
     # step1: before touching in, first ensure that the card is not in use
     it 'is initially not in use' do
       expect(subject).not_to be_in_journey
@@ -46,34 +38,54 @@ RSpec.describe Oystercard do
     # step2: after made sure the card is not in use, allow to touch in
     it 'can touch in if not already touched in' do
       card = Oystercard.new(10)
-      card.touch_in(station)
+      card.touch_in(entry_station)
       expect(card).to be_in_journey
     end 
 
     it 'cannot touch in when balance is below minimum balance' do
       card = Oystercard.new(0.5)
-      expect{card.touch_in(station)}.to raise_error 'Balance is below minimum'
+      expect{card.touch_in(entry_station)}.to raise_error "Balance is below #{Oystercard::MINIMUM_FARE}"
     end 
     
     it 'record the station when you touch in' do
       card = Oystercard.new(10)
-      card.touch_in(station)
-      expect(card.entry_station).to eq station
+      card.touch_in(entry_station)
+      expect(card.entry_station).to eq entry_station
     end 
   end 
   
   describe '#touch_out' do 
-  let(:station){double(:station)} 
+  let(:entry_station){double(:entry_station)} 
+  let(:exit_station){double(:exit_station)} 
     it 'can touch out' do
-      card = Oystercard.new(20)
-      card.touch_in(station)
-      card.touch_out
+      card = Oystercard.new(10)
+      card.touch_in(entry_station)
+      card.touch_out(exit_station)
       expect(card).not_to be_in_journey
     end
 
     it 'update the balance by deducting the minimum fare £1 when touch out' do
-    card = Oystercard.new(5)
-    expect{card.touch_out}.to change {card.balance}.by(-Oystercard::MINIMUM_FARE)
+    card = Oystercard.new(10)
+    expect{card.touch_out(exit_station)}.to change {card.balance}.by(-Oystercard::MINIMUM_FARE)
+    end 
+
+    it 'record station when touch out' do 
+      card = Oystercard.new(10)
+      card.touch_out(exit_station)
+      expect(card.exit_station).to eq exit_station
+    end 
+  end 
+  
+  describe '#travel_history' do
+    let(:travel_history) {{entry_station:entry_station, exit_station:exit_station}}
+    let(:entry_station){double(:entry_station)} 
+    let(:exit_station){double(:exit_station)} 
+  
+    it 'track a travel' do
+        card = Oystercard.new(10)
+        card.touch_in("Crosshabour")
+        card.touch_out("Old Street")
+        expect(card.travel_history).to eq [{entry_station:"Crosshabour", exit_station:"Old Street"}]
     end 
   end 
 end 
