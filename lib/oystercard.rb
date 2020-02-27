@@ -25,13 +25,13 @@ class Oystercard
     fail "Balance is below #{Oystercard::MINIMUM_FARE}" if below_min
     @entry_station = entry_station
     @station_recorder = {}
-    @station_recorder[:entry_station] = @entry_station
+    @station_recorder[:entry_station] = entry_station
   end 
 
   
   def touch_out(exit_station)
     @exit_station = exit_station
-    @station_recorder[:exit_station] = @exit_station
+    @station_recorder[:exit_station] = exit_station
     @travel_history.push(@station_recorder)
     deduct
     @entry_station = nil

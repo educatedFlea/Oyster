@@ -66,11 +66,13 @@ RSpec.describe Oystercard do
 
     it 'update the balance by deducting the minimum fare £1 when touch out' do
     card = Oystercard.new(10)
+    card.touch_in(entry_station)
     expect{card.touch_out(exit_station)}.to change {card.balance}.by(-Oystercard::MINIMUM_FARE)
     end 
 
     it 'record station when touch out' do 
       card = Oystercard.new(10)
+      card.touch_in(entry_station)
       card.touch_out(exit_station)
       expect(card.exit_station).to eq exit_station
     end 
@@ -81,11 +83,11 @@ RSpec.describe Oystercard do
     let(:entry_station){double(:entry_station)} 
     let(:exit_station){double(:exit_station)} 
   
-    it 'track a travel' do
-        card = Oystercard.new(10)
-        card.touch_in("Crosshabour")
-        card.touch_out("Old Street")
-        expect(card.travel_history).to eq [{entry_station:"Crosshabour", exit_station:"Old Street"}]
+    it 'track a complete travel (in&out)' do
+      card = Oystercard.new(10)
+      card.touch_in("Crosshabour")
+      card.touch_out("Old Street")
+      expect(card.travel_history).to eq [{entry_station:"Crosshabour", exit_station:"Old Street"}]
     end 
-  end 
+  end   
 end 
